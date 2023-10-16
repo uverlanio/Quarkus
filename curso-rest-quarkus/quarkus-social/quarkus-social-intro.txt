@@ -1,0 +1,14 @@
+Utilizando o framework Quarkus, simulando uma pequena rede social, onde através de uma api rest, contém
+as seguintes ações.
+
+CRUD usuário
+Listar e criar post do usuário
+Tornar ou não um usuário seguidor, podendo mostrar os posts do usuário ao seguidor
+
+Maven
+
+Como listar as extensões:
+.\mvnw quarkus:list-extensions
+
+Como instalar as extensões:
+.\mvnw quarkus:add-extension -Dextensions="EXTENSION"
