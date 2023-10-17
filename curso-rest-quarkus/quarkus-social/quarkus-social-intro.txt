@@ -12,3 +12,5 @@ Como listar as extensões:
 
 Como instalar as extensões:
 .\mvnw quarkus:add-extension -Dextensions="EXTENSION"
+
+.\mvnw quarkus:add-extension -Dextensions="quarkus-rest-client-jsonb"
