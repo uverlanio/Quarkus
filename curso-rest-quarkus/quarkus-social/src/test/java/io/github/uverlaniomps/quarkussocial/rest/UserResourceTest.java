@@ -1,24 +1,32 @@
 package io.github.uverlaniomps.quarkussocial.rest;
 
-import groovy.json.JsonBuilder;
+import com.sun.tools.rngom.util.Uri;
 import io.github.uverlaniomps.quarkussocial.domain.model.User;
+import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.json.bind.JsonbBuilder;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.*;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @QuarkusTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserResourceTest {
+
+    @TestHTTPResource("/users")
+    URL apiURL;
 
     @Test
     @DisplayName("Should create a user successfully")
+    @Order(1)
     void createUserTest() {
 
         var user = new User();
@@ -30,7 +38,7 @@ class UserResourceTest {
                     .contentType(ContentType.JSON)
                     .body(JsonbBuilder.create().toJson(user))
                 .when()
-                    .post("/users")
+                    .post(apiURL.toString())
                 .then()
                     .extract().response();
 
@@ -41,7 +49,8 @@ class UserResourceTest {
 
     @Test
     @DisplayName("Should return error when json is not valid")
-    void createuserValidationErrorTest() {
+    @Order(2)
+    void createUserValidationErrorTest() {
 
         var user = new User();
         user.setName(null);
@@ -52,7 +61,7 @@ class UserResourceTest {
                         .contentType(ContentType.JSON)
                         .body(JsonbBuilder.create().toJson(user))
                         .when()
-                        .post("/users")
+                        .post(apiURL.toString())
                         .then()
                         .extract().response();
 
@@ -64,10 +73,16 @@ class UserResourceTest {
     }
 
     @Test
-    void deleteUsers() {
+    @Order(3)
+    void listUsersTest() {
+
+        given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get(apiURL.toString())
+                .then()
+                .body("size()", Matchers.is(1));
     }
 
-    @Test
-    void updateUsers() {
-    }
+
 }
