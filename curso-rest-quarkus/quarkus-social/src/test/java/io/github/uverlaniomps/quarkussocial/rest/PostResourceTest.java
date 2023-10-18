@@ -10,10 +10,10 @@ import jakarta.inject.Inject;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.*;
 @QuarkusTest
 @TestHTTPEndpoint(PostResource.class)
 class PostResourceTest {
@@ -34,20 +34,39 @@ class PostResourceTest {
         userId = user.getId();
     }
     @Test
+    @DisplayName("Should create a post for user")
     void savePostTest(){
 
         var postRequest = new CreatePostRequest();
         postRequest.setText("some text");
 
-        var response = given()
+        given()
                 .contentType(ContentType.JSON)
                 .body(JsonbBuilder.create().toJson(postRequest))
                 .pathParam("userId", userId)
                 .when()
                 .post()
                 .then()
-                   .extract().response();
+                .statusCode(201);
+    }
 
-        assertEquals(201, response.getStatusCode());
+    @Test
+    @DisplayName("Should return 404 when trying to make a post for an inexistent user")
+    void postForAnInexistentUserTest(){
+
+        var postRequest = new CreatePostRequest();
+        postRequest.setText("some text");
+
+        Long inexistentUserId = 999L;
+
+        var response = given()
+                .contentType(ContentType.JSON)
+                .body(JsonbBuilder.create().toJson(postRequest))
+                .pathParam("userId", inexistentUserId)
+                .when()
+                .post()
+                .then()
+                .statusCode(404);
+
     }
 }
