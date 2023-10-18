@@ -67,7 +67,7 @@ class PostResourceTest {
                 .when()
                 .post()
                 .then()
-                .statusCode(400);
+                .statusCode(404);
 
     }
 
@@ -91,7 +91,6 @@ class PostResourceTest {
 
         given()
                 .pathParam("userId", userId)
-                .headers("followerId", 1L)
                 .when()
                 .get()
                 .then()
