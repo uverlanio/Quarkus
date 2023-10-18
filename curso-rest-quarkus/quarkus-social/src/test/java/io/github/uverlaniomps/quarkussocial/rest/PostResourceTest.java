@@ -9,6 +9,7 @@ import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.transaction.Transactional;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,62 @@ class PostResourceTest {
                 .when()
                 .post()
                 .then()
-                .statusCode(404);
+                .statusCode(400);
+
+    }
+
+    @Test
+    @DisplayName("Should return 404 when user doesn't exist")
+    void listPostUserNotFoundTest(){
+        var inexistentUserId = 999;
+
+        given()
+                .pathParam("userId", inexistentUserId)
+                .when()
+                .get()
+                .then()
+                .statusCode(400);
+
+    }
+
+    @Test
+    @DisplayName("Should return 400 when followerId header is not present")
+    void listPostFollowerHeaderNotSendTest(){
+
+        given()
+                .pathParam("userId", userId)
+                .headers("followerId", 1L)
+                .when()
+                .get()
+                .then()
+                .statusCode(400)
+                .body(Matchers.is("You forgot the header followerId"));
+    }
+
+    @Test
+    @DisplayName("Should return 400 when follower doesn't exist")
+    void listPostFollowerNotFoundTest(){
+        Long inexistentFollowerId = 999L;
+
+        given()
+                .pathParam("userId", userId)
+                .headers("followerId", inexistentFollowerId)
+                .when()
+                .get()
+                .then()
+                .statusCode(400)
+                .body(Matchers.is("Inexistent followerId"));
+    }
+
+    @Test
+    @DisplayName("Should return 403 when follower isn't a follower")
+    void listPostNotAFollowerTest(){
+
+    }
+
+    @Test
+    @DisplayName("Should return posts")
+    void listPostTest(){
 
     }
 }

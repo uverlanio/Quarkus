@@ -75,7 +75,7 @@ public class PostResource {
 
         if(follower == null){
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Inexistent follower.")
+                    .entity("Inexistent followerId")
                     .build();
         }
 
@@ -87,7 +87,7 @@ public class PostResource {
 
         if(!follows){
             return Response.status(Response.Status.FORBIDDEN)
-                    .entity("You can't see these folloers")
+                    .entity("You can't see these followers")
                     .build();
         }
 
