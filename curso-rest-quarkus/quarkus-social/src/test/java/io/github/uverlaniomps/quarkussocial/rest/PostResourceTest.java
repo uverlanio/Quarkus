@@ -1,6 +1,10 @@
 package io.github.uverlaniomps.quarkussocial.rest;
 
+import io.github.uverlaniomps.quarkussocial.domain.model.Follower;
+import io.github.uverlaniomps.quarkussocial.domain.model.Post;
 import io.github.uverlaniomps.quarkussocial.domain.model.User;
+import io.github.uverlaniomps.quarkussocial.domain.repository.FollowerRepository;
+import io.github.uverlaniomps.quarkussocial.domain.repository.PostRepository;
 import io.github.uverlaniomps.quarkussocial.domain.repository.UserRepository;
 import io.github.uverlaniomps.quarkussocial.rest.dto.CreatePostRequest;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
@@ -22,10 +26,19 @@ class PostResourceTest {
     @Inject
     UserRepository userRepository;
 
+    @Inject
+    FollowerRepository followerRepository;
+
+    @Inject
+    PostRepository postRepository;
+
     Long userId;
+    Long userNotFollowerId;
+    Long userFollowerId;
     @BeforeEach
     @Transactional
     void setUp(){
+        // Usuário padrão de testes
         User user = User.builder()
                 .name("Fulano")
                 .age(30)
@@ -33,6 +46,37 @@ class PostResourceTest {
 
         userRepository.persist(user);
         userId = user.getId();
+
+        // Criar a postagem do usuário
+        Post post = Post.builder()
+                .text("Hello")
+                .user(user)
+                .build();
+
+        postRepository.persist(post);
+
+        User userNotFollower = User.builder()
+                .name("Cicrano")
+                .age(33)
+                .build();
+
+        userRepository.persist(userNotFollower);
+        userNotFollowerId = userNotFollower.getId();
+
+        User userFollower = User.builder()
+                .name("Terceiro")
+                .age(31)
+                .build();
+
+        userRepository.persist(userFollower);
+        userFollowerId = userFollower.getId();
+
+        Follower follower = Follower.builder()
+                .user(user)
+                .follower(userFollower)
+                .build();
+
+        followerRepository.persist(follower);
     }
     @Test
     @DisplayName("Should create a post for user")
@@ -45,9 +89,9 @@ class PostResourceTest {
                 .contentType(ContentType.JSON)
                 .body(JsonbBuilder.create().toJson(postRequest))
                 .pathParam("userId", userId)
-                .when()
+        .when()
                 .post()
-                .then()
+        .then()
                 .statusCode(201);
     }
 
@@ -64,9 +108,9 @@ class PostResourceTest {
                 .contentType(ContentType.JSON)
                 .body(JsonbBuilder.create().toJson(postRequest))
                 .pathParam("userId", inexistentUserId)
-                .when()
+        .when()
                 .post()
-                .then()
+        .then()
                 .statusCode(404);
 
     }
@@ -78,9 +122,9 @@ class PostResourceTest {
 
         given()
                 .pathParam("userId", inexistentUserId)
-                .when()
+        .when()
                 .get()
-                .then()
+        .then()
                 .statusCode(400);
 
     }
@@ -91,9 +135,9 @@ class PostResourceTest {
 
         given()
                 .pathParam("userId", userId)
-                .when()
+        .when()
                 .get()
-                .then()
+        .then()
                 .statusCode(400)
                 .body(Matchers.is("You forgot the header followerId"));
     }
@@ -106,9 +150,9 @@ class PostResourceTest {
         given()
                 .pathParam("userId", userId)
                 .headers("followerId", inexistentFollowerId)
-                .when()
+        .when()
                 .get()
-                .then()
+        .then()
                 .statusCode(400)
                 .body(Matchers.is("Inexistent followerId"));
     }
@@ -116,12 +160,27 @@ class PostResourceTest {
     @Test
     @DisplayName("Should return 403 when follower isn't a follower")
     void listPostNotAFollowerTest(){
-
+        given()
+                .pathParam("userId", userId)
+                .headers("followerId", userNotFollowerId)
+        .when()
+                .get()
+        .then()
+                .statusCode(403)
+                .body(Matchers.is("You can't see these followers"));
     }
 
     @Test
     @DisplayName("Should return posts")
     void listPostTest(){
+        given()
+                .pathParam("userId", userId)
+                .headers("followerId", userFollowerId)
+        .when()
+                .get()
+        .then()
+                .statusCode(200)
+                .body("size()", Matchers.is(1));
 
     }
 }

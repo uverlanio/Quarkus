@@ -60,9 +60,9 @@ class UserResourceTest {
                 given()
                         .contentType(ContentType.JSON)
                         .body(JsonbBuilder.create().toJson(user))
-                        .when()
+                .when()
                         .post(apiURL.toString())
-                        .then()
+                .then()
                         .extract().response();
 
         assertEquals(422, response.statusCode());
@@ -78,9 +78,9 @@ class UserResourceTest {
 
         given()
                 .contentType(ContentType.JSON)
-                .when()
+        .when()
                 .get(apiURL.toString())
-                .then()
+        .then()
                 .body("size()", Matchers.is(1));
     }
 
