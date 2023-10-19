@@ -31,7 +31,7 @@ public class FollowerResource {
         User user = userRepository.findById(userId);
 
         if(userId.equals(request.getFollowerId())){
-            return Response.status(Response.Status.CONFLICT).entity("You can't follow yourself.").build();
+            return Response.status(Response.Status.CONFLICT).entity("You can't follow yourself").build();
         }
 
         if(user == null){
@@ -68,7 +68,10 @@ public class FollowerResource {
         FollowersPerUserResponse fpur = new FollowersPerUserResponse();
         fpur.setFollowersCount(list.size());
 
-        var followeList = list.stream().map(FollowerResponse::new).collect(Collectors.toList());
+        var followeList = list.stream()
+                .map(FollowerResponse::new)
+                .collect(Collectors.toList());
+
         fpur.setContent(followeList);
 
         return Response.ok(fpur).build();
@@ -76,7 +79,7 @@ public class FollowerResource {
 
     @DELETE
     @Transactional
-    public Response unfllowUser(
+    public Response unfollowUser(
             @PathParam("userId") Long userId,
             @QueryParam("followerId") Long followerId){
         User user = userRepository.findById(userId);
@@ -85,7 +88,7 @@ public class FollowerResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        followerRepository.deleteByFolloweAndUser(followerId, userId);
+        followerRepository.deleteByFollowerAndUser(followerId, userId);
 
         return Response.status(Response.Status.NO_CONTENT).build();
     }

@@ -83,6 +83,4 @@ class UserResourceTest {
         .then()
                 .body("size()", Matchers.is(1));
     }
-
-
 }

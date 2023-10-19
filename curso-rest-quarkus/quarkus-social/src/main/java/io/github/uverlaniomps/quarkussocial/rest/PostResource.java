@@ -1,6 +1,5 @@
 package io.github.uverlaniomps.quarkussocial.rest;
 
-import io.github.uverlaniomps.quarkussocial.domain.model.Follower;
 import io.github.uverlaniomps.quarkussocial.domain.model.Post;
 import io.github.uverlaniomps.quarkussocial.domain.model.User;
 import io.github.uverlaniomps.quarkussocial.domain.repository.FollowerRepository;
@@ -16,7 +15,6 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
